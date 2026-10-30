@@ -1,0 +1,8 @@
+# build
+flatspkg
+gen-gettext
+install
+
+# locales gerados
+*.mo
+*.po~

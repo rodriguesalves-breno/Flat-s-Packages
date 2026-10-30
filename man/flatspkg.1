@@ -1,0 +1,152 @@
+.\" SPDX-License-Identifier: AGPL-3.0-only
+.TH FLATSPKG 1 "2026-10-29" "flatspkg 1.0" "User Commands"
+.SH NAME
+flatspkg \- interactive terminal manager for Flatpak applications
+.SH SYNOPSIS
+.B flatspkg
+.RB [ \-u | \-\-update-cache ]
+.RB [ \-v | \-\-version ]
+.RB [ \-l \| LANG | \-\-lang=LANG ]
+.RB [ \-h | \-\-help ]
+.SH DESCRIPTION
+.B flatspkg
+is an interactive terminal application manager written in C. It uses
+.BR fzf (1)
+to browse and select applications from the Flathub remote, and invokes
+.BR flatpak (1)
+to install, uninstall, and update applications.
+.PP
+The main menu provides Install, Remove, Update, and Exit actions. Multiple
+applications can be selected in the installation and removal selectors.
+Installations are invoked with Flatpak's automatic confirmation option;
+uninstallations are invoked without that option and may prompt for
+confirmation.
+.PP
+The Flathub application catalog is cached in
+.I $HOME/.cache/flatspkg-flathub.cache
+and refreshed when absent, empty, or more than 24 hours old. The
+.B \-u
+option forces a refresh. After attempting the refresh, the program continues
+to the interactive menu; if refresh fails, a previously usable cache may
+still be used.
+.PP
+Translations for Brazilian Portuguese, Spanish, French, and German are
+embedded in the executable; English is the default. The language can be
+forced with
+.BR \-l / \-\-lang ,
+or detected from the environment. No external locale files, gettext
+library, or language packs are required.
+.SH OPTIONS
+.TP
+.BR \-u , \ \-\-update-cache
+Regenerate the local Flathub application cache before opening the menu.
+Without this option, the cache is regenerated if it is missing, empty, or
+more than 24 hours old. This option does not exit after refreshing; the
+interactive menu is opened afterward.
+.TP
+.BR \-v , \ \-\-version
+Print the program name and version to standard output, then exit. This option
+is processed before runtime dependency checks.
+.TP
+.BR \-l \ LANG , \ \-\-lang= LANG
+Force the interface language. Accepted values are
+.BR pt ,
+.BR pt_BR ,
+.BR pt-BR ,
+.BR es ,
+.BR fr ,
+.BR de ,
+and
+.BR en ,
+case-insensitively. The short form is
+.BR \-l LANG ;
+the long form accepts either
+.B \-\-lang LANG
+or
+.BR \-\-lang= LANG .
+.TP
+.BR \-h , \ \-\-help
+Print a short usage summary to standard output, then exit. This option is
+processed before runtime dependency checks.
+.SH ENVIRONMENT
+.TP
+.B HOME
+Used to determine the cache path. Required for the normal application flow;
+if unset, the program exits with an error. The help and version options exit
+before this value is needed.
+.TP
+.B LANGUAGE
+If set and nonempty, takes precedence over
+.B LANG .
+Only the first entry is used when it contains a colon-separated list.
+.TP
+.B LANG
+Locale used for language detection when
+.B LANGUAGE
+is unset or empty. The program strips encoding and modifier suffixes. The
+language selection is based on the language prefix; unrecognized languages
+fall back to English.
+.PP
+An explicit language supplied with
+.B \-l
+or
+.B \-\-lang
+takes precedence over both environment variables.
+.SH FILES
+.TP
+.I ~/.cache/flatspkg-flathub.cache
+Cached, formatted list of applications from Flathub. The cache is refreshed
+when missing, empty, or more than 24 hours old, or when explicitly requested
+with
+.BR \-u .
+.SH DEPENDENCIES
+.TP
+.BR flatpak (1)
+Required for catalog queries and Flatpak operations.
+.TP
+.BR fzf (1)
+Required for the interactive selectors.
+.PP
+Both executables must be available in
+.BR PATH .
+The
+.B \-h
+and
+.B \-v
+options can be used without these runtime dependencies.
+.SH EXIT STATUS
+.TP
+.B 0
+The help or version was printed, or the interactive menu completed or was
+dismissed.
+.TP
+.B 1
+An unknown option was supplied, a required language argument is missing, an
+unsupported language was selected, the normal flow cannot determine
+.BR HOME ,
+or a required runtime dependency is unavailable.
+.SH EXAMPLES
+.TP
+.B flatspkg
+Start the interactive menu.
+.TP
+.B flatspkg --update-cache
+Force-refresh the Flathub cache, then open the menu.
+.TP
+.B flatspkg --lang=pt_BR
+Run with the Brazilian Portuguese interface.
+.TP
+.B LANG=fr_FR.UTF-8 flatspkg
+Run with the French interface.
+.TP
+.B LANGUAGE=de flatspkg
+Run with the German interface, even if
+.B LANG
+specifies another language.
+.SH SEE ALSO
+.BR flatpak (1),
+.BR fzf (1)
+.SH AUTHOR
+Breno Rodrigues Alves.
+.SH LICENSE
+AGPL-3.0-only.
